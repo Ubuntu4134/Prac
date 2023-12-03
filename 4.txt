@@ -1,0 +1,69 @@
+import org.apache.activemq.ActiveMQConnectionFactory;
+import javax.jms.*;
+public class PubSubExample
+{
+public static void main(String[] args) throws JMSException
+{
+// Connection parameters
+String brokerURL = "tcp://localhost:61616";
+String topicName = "exampleTopic";
+
+// Create a ConnectionFactory
+ConnectionFactory = new ActiveMQConnectionFactory(brokerURL);
+
+// Create and start a connection
+Connection = connectionFactory.createConnection();
+connection.start();
+
+// Create a session
+Session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+
+// Create the topic
+Topic = session.createTopic(topicName);
+
+// Create a publisher
+MessageProducer publisher = session.createProducer(topic);
+
+// Create a subscriber
+MessageConsumer subscriber = session.createConsumer(topic);
+
+// Set up a listener for the subscriber
+subscriber.setMessageListener(message ->
+
+{
+if (message instanceof TextMessage)
+{
+try {
+
+System.out.println("Received message: " + ((TextMessage)
+message).getText());
+} catch (JMSException e) {
+e.printStackTrace();
+
+}
+}
+});
+
+// Publish some messages
+sendMessage(session, publisher, "Hello, World!");
+sendMessage(session, publisher, "This is a test message.");
+sendMessage(session, publisher, "Goodbye!");
+
+// Clean up
+session.close();
+connection.close();
+}
+
+private static void sendMessage(Session session, MessageProducer producer, String text)
+{
+try {
+TextMessage message = session.createTextMessage();
+
+message.setText(text);
+producer.send(message);
+System.out.println("Sent message: " + text);
+} catch (JMSException e) {
+e.printStackTrace();
+}
+}
+}

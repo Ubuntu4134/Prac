@@ -1,0 +1,71 @@
+Exp 4:
+
+Step 1: Install RabbitMQ on Ubuntu
+bash
+
+# Update package list
+sudo apt-get update
+
+# Install RabbitMQ server
+sudo apt-get install rabbitmq-server
+
+# Start the RabbitMQ server
+sudo service rabbitmq-server start
+
+Step 2: pip install pika
+Step 3: Create Publisher
+Create a file named publisher.py:
+
+python
+
+import pika
+
+connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+channel = connection.channel()
+
+channel.exchange_declare(exchange='logs', exchange_type='fanout')
+
+message = "Hello, subscribers!"
+channel.basic_publish(exchange='logs', routing_key='', body=message)
+
+print(f" [x] Sent '{message}'")
+
+connection.close()
+
+
+Step 4: Create Subscriber
+Create a file named subscriber.py:
+
+import pika
+
+def callback(ch, method, properties, body):
+    print(f" [x] Received {body}")
+
+connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+channel = connection.channel()
+
+channel.exchange_declare(exchange='logs', exchange_type='fanout')
+
+result = channel.queue_declare(queue='', exclusive=True)
+queue_name = result.method.queue
+
+channel.queue_bind(exchange='logs', queue=queue_name)
+
+print(' [*] Waiting for messages. To exit, press Ctrl+C')
+
+channel.basic_consume(queue=queue_name, on_message_callback=callback, auto_ack=True)
+
+channel.start_consuming()
+
+Step 5: Run the Publisher
+Open a terminal and run the publisher:
+
+bash
+Copy code
+python publisher.py
+Step 6: Run the Subscribers
+Open multiple terminals and run the subscribers:
+
+bash
+Copy code
+python subscriber.py

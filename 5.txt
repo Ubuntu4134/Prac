@@ -1,0 +1,50 @@
+Code for Web Service:
+//Service resource.java
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+
+@Path("/service")
+public class ServiceResource
+{
+@GET
+@Produces(MediaType.TEXT_PLAIN)
+public String getHello()
+{
+return "Hello from the web service!";
+}
+}
+
+//serviceApplications.java
+import org.glassfish.jersey.server.ResourceConfig;
+import javax.ws.rs.ApplicationPath;
+@ApplicationPath("/api")
+public class ServiceApplication extends ResourceConfig
+{
+public ServiceApplication()
+{
+
+packages("your.package.name"); // Change this to your actual package name
+}
+}
+
+Code for Client application:
+//ServiceClient.java
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.core.MediaType;
+public class ServiceClient
+{
+public static void main(String[] args)
+{
+Client = ClientBuilder.newClient();
+String serviceURL = "http://localhost:8080/api/service"; // Change the URL
+if needed
+String response =
+client.target(serviceURL).request(MediaType.TEXT_PLAIN).get(String.class);
+System.out.println("Response from the web service:");
+System.out.println(response);
+client.close();
+}
+}
